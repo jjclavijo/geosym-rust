@@ -1,0 +1,132 @@
+use crate::utils::Config;
+
+//pub fn simulate_noise(config: &Config) -> bool {
+//        
+//}
+
+
+//import os
+//import math
+//import time
+//import sys
+//import numpy as np
+//import argparse
+//import toml
+//from scipy import signal
+//from pathlib import Path
+//from scipy.special import kv
+//
+//#from eletor.control import Control, parse_retro_ctl
+//#from eletor.observations import Observations, momwrite
+//
+//from eletor import create_hs
+//from eletor.helper import mactrick
+//#===============================================================================
+//# Subroutines
+//#===============================================================================
+//
+//def simulate_noise(control):
+//    """
+//    El objetivo de esta función ahora es simplemente hacer el unpack
+//    de las opciones generales.
+//    """
+//
+//    #--- Some variables that define the runs
+//    ## Unpack all variables from the control object
+//    n_simulations = control['general'].get("NumberOfSimulations",1)
+//    m             = control['general'].get("NumberOfPoints")
+//    dt            = control['general'].get("SamplingPeriod")
+//    ms            = control['general'].get("TimeNoiseStart",0)
+//    noiseModels   = control['NoiseModels']
+//
+//    repeatablenoise = control['general'].get('RepeatableNoise',False)
+//    deterministic_noise = control['general'].get('DeterministicNoise',False)
+//
+//    #--- Start the clock!
+//    start_time = time.time()
+//
+//    #--- Create random number generator
+//    rng = np.random.default_rng(0) if repeatablenoise else None
+//
+//    ## For testing purposes
+//    if deterministic_noise:
+//        from eletor.not_rng import rng
+//
+//    #--- TODO: antes en esta parte se trataban los tiempos.
+//    # Por ahora no estamos implementando un índice de tiempo
+//    # durante la simulación. El indice que hector generaba
+//    # era puramente pensado para la salida en formato .mom
+//    # así que pasó a compat.
+//
+//    #--- Run all simulations
+//    simulaciones = []
+//    for k in range(0,n_simulations):
+//
+//        y = create_noise(m,dt,ms,noiseModels,rng)
+//        simulaciones.append(y)
+//
+//    #--- Show time lapsed
+//    print("--- {0:8.3f} seconds ---\n".format(float(time.time() - start_time)))
+//
+//    return simulaciones
+//
+//#===============================================================================
+//# Signal Creation Functions
+//#===============================================================================
+//
+//# TODO: probablemente esto se tenga que mudar o eliminar, creo que en algún
+//# lado se usa, pero queda como documentación sino.
+//_paramlist = {'White':('NumberOfPoints','Sigma'),
+//              'Powerlaw':('NumberOfPoints','Sigma','Kappa','TS_format','SamplingPeriod'),
+//              'Flicker':('NumberOfPoints','Sigma','TS_format','SamplingPeriod'),
+//              'RandomWalk':('NumberOfPoints','Sigma','TS_format','SamplingPeriod'),
+//              'GGM':('NumberOfPoints','Sigma','Kappa','GGM_1mphi','TS_format','SamplingPeriod'),
+//              'VaryingAnnual':('NumberOfPoints','Sigma','Phi','TS_format','SamplingPeriod'),
+//              'Matern':('NumberOfPoints','Sigma','Lambda','Kappa'),
+//              'AR1':('NumberOfPoints','Sigma','Phi')}
+//
+//def create_noise(
+//        m,
+//        dt,
+//        ms,
+//        noiseModels,
+//        rng=None
+//    ):
+//    """ Toma la lista de los modelos que quiere usar junto con los parametros y
+//    instancia los nuevos modelos desde create_h
+//    """
+//    print("Params de create_noise: ", m, dt, ms, noiseModels, rng)
+//    sigma = []
+//    h = []
+//    for model, params in noiseModels.items():
+//        ## Dinamycally get and call the function using the model name
+//        model_function = getattr(create_hs, model)
+//
+//        for i in params.keys():
+//            ## Cada modelo puede estar mas de una vez
+//            print(f"--> About to run model {model} with params {params[i]}")
+//            single_s, single_h = model_function(**params[i])
+//            sigma.append(single_s)
+//            h.append(single_h)
+//
+//    #--- Create random number generator
+//    if rng is None:
+//        rng = np.random.default_rng()
+//
+//    #--- Create the synthetic noise
+//    y = np.zeros(m)
+//
+//    for s,ha in zip(sigma,h):
+//        w = s * rng.standard_normal(m+ms)
+//        y += signal.fftconvolve(ha, w)[0:m]
+//
+//    return y
+
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_simulate_noise() {
+        assert_eq!(1, 1);
+    }
+}

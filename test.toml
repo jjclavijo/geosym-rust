@@ -1,0 +1,21 @@
+[general]
+number_of_points=1000
+sampling_period=1
+
+[noise_models.ggm.params]
+time_noise_start=0
+m=1000
+sigma=0.2
+kappa=0.1
+one_minus_phi=0.01 # GGN_1mphi
+dt=1 # Sampling period
+units="mom" # TS-format
+
+[noise_models.linear.params]
+time_noise_start=0
+m=1000
+sigma=0.2
+kappa=0.1
+one_minus_phi=0.01 # GGN_1mphi
+dt=1 # Sampling period
+units="mom" # TS-format
