@@ -37,6 +37,18 @@ fn recursion_power_flicker_rw(m: usize, d: f32) -> Vec<f32>{
     h
 }
 
+fn recursion_ggm(m: usize, d: f32, one_minus_phi: f32) -> Vec<f32> {
+    let mut h: Vec<f32> = vec![0.0; m];
+    h[0] = 1.0;
+    let mut h0: f32 = 1.0;
+    
+    for i in 1..m {
+        h[i] = (d+i as f32-1.0)/i as f32 * h0 * (1.0 - one_minus_phi);
+        h0 = (d+i as f32-1.0)/i as f32 * h0 * (1.0 - one_minus_phi);
+    }
+    h
+}
+
 macro_rules! assert_eq_float {
     ($v1: expr, $v2: expr, $d: expr ) => {
         if ($v1 - $v2).abs() > $d {
@@ -61,7 +73,11 @@ macro_rules! assert_eq_float_vec {
 
 #[cfg(test)]
 mod tests {
-    use crate::create_hs::{white_noise, recursion_power_flicker_rw};
+    use crate::create_hs::{
+        white_noise, 
+        recursion_power_flicker_rw,
+        recursion_ggm,
+    };
 
     #[test]
     fn test_white_ok() {
@@ -115,4 +131,19 @@ mod tests {
         assert_eq_float_vec!(response, expected, 0.000001);
 
     }
+
+    #[test]
+    fn recursive_ggn_ok(){
+        let m: usize = 10;
+        let d: f32 = 0.5;
+        let one_minus_phi: f32 = 0.01;
+
+        let response = recursion_ggm(m, d, one_minus_phi);
+        let expected: Vec<f32> = vec![1., 0.495, 0.3675375 , 0.30321844, 0.26266297, 0.23403271, 0.21238468, 0.1952422 , 0.18120917, 0.16943057];
+        
+        assert_eq_float_vec!(response, expected, 0.000001);
+
+    }
 }
+
+
