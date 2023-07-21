@@ -1,90 +1,61 @@
 use crate::utils::Config;
+//use crate::utils::NoiseModels;
+use std::time::Instant;
+use rand::thread_rng;
+//use rand::rngs::ThreadRng;
 
-//pub fn simulate_noise(config: &Config) -> bool {
-//        
+pub fn simulate_noise(config: &Config) -> bool {
+        
+    //--- Some variables that define the runs
+    // Unpack all variables from the control object
+    let n_simulations = config.general.number_of_simulations;
+    let m = config.general.number_of_points;
+    let dt = config.general.sampling_period;
+    let ms = config.general.time_noise_start;
+    //let noise_models = &config.noise_models;
+
+    let repeatable_noise = config.general.repeatable_noise;
+    let deterministic_noise = config.general.deterministic_noise;
+    
+    // Start timer
+    let start_time = Instant::now();
+    
+    // Create random number generator
+    let rng = thread_rng();
+
+    // Run all simulations
+    let mut simulations: Vec<Vec<f32>> = vec![];
+    
+    //for k in 0..n_simulations {
+    //    let y = create_noise(m, dt, ms, noise_models, &rng);
+    //    simulations.push(y)
+    //}
+
+    let elapsed = start_time.elapsed();
+    println!("--- {:} seconds ---", elapsed.as_secs());
+    
+    for s in simulations.iter() {
+        println!("{:?}", s);
+    }
+    true
+}
+
+
+
+//fn create_noise(m: i32, dt: f32, ms: i32, noise_models: &NoiseModels, rng: &ThreadRng) -> Vec<f32> {
+//
+//    println!("create_noise parameters {:?} {:?} {:?}", m, dt, ms);
+//    let sigma: Vec<f32> = Vec::new();
+//    let h: Vec<f32> = Vec::new();
+//    
+//    //for model in noise_models.items() {
+//    //    println!("{:?}", model);
+//    //}
+//
+//    sigma
 //}
 
 
-//import os
-//import math
-//import time
-//import sys
-//import numpy as np
-//import argparse
-//import toml
-//from scipy import signal
-//from pathlib import Path
-//from scipy.special import kv
-//
-//#from eletor.control import Control, parse_retro_ctl
-//#from eletor.observations import Observations, momwrite
-//
-//from eletor import create_hs
-//from eletor.helper import mactrick
-//#===============================================================================
-//# Subroutines
-//#===============================================================================
-//
-//def simulate_noise(control):
-//    """
-//    El objetivo de esta función ahora es simplemente hacer el unpack
-//    de las opciones generales.
-//    """
-//
-//    #--- Some variables that define the runs
-//    ## Unpack all variables from the control object
-//    n_simulations = control['general'].get("NumberOfSimulations",1)
-//    m             = control['general'].get("NumberOfPoints")
-//    dt            = control['general'].get("SamplingPeriod")
-//    ms            = control['general'].get("TimeNoiseStart",0)
-//    noiseModels   = control['NoiseModels']
-//
-//    repeatablenoise = control['general'].get('RepeatableNoise',False)
-//    deterministic_noise = control['general'].get('DeterministicNoise',False)
-//
-//    #--- Start the clock!
-//    start_time = time.time()
-//
-//    #--- Create random number generator
-//    rng = np.random.default_rng(0) if repeatablenoise else None
-//
-//    ## For testing purposes
-//    if deterministic_noise:
-//        from eletor.not_rng import rng
-//
-//    #--- TODO: antes en esta parte se trataban los tiempos.
-//    # Por ahora no estamos implementando un índice de tiempo
-//    # durante la simulación. El indice que hector generaba
-//    # era puramente pensado para la salida en formato .mom
-//    # así que pasó a compat.
-//
-//    #--- Run all simulations
-//    simulaciones = []
-//    for k in range(0,n_simulations):
-//
-//        y = create_noise(m,dt,ms,noiseModels,rng)
-//        simulaciones.append(y)
-//
-//    #--- Show time lapsed
-//    print("--- {0:8.3f} seconds ---\n".format(float(time.time() - start_time)))
-//
-//    return simulaciones
-//
-//#===============================================================================
-//# Signal Creation Functions
-//#===============================================================================
-//
-//# TODO: probablemente esto se tenga que mudar o eliminar, creo que en algún
-//# lado se usa, pero queda como documentación sino.
-//_paramlist = {'White':('NumberOfPoints','Sigma'),
-//              'Powerlaw':('NumberOfPoints','Sigma','Kappa','TS_format','SamplingPeriod'),
-//              'Flicker':('NumberOfPoints','Sigma','TS_format','SamplingPeriod'),
-//              'RandomWalk':('NumberOfPoints','Sigma','TS_format','SamplingPeriod'),
-//              'GGM':('NumberOfPoints','Sigma','Kappa','GGM_1mphi','TS_format','SamplingPeriod'),
-//              'VaryingAnnual':('NumberOfPoints','Sigma','Phi','TS_format','SamplingPeriod'),
-//              'Matern':('NumberOfPoints','Sigma','Lambda','Kappa'),
-//              'AR1':('NumberOfPoints','Sigma','Phi')}
-//
 //def create_noise(
 //        m,
 //        dt,
