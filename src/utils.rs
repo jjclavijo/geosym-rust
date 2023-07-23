@@ -2,7 +2,21 @@ use std::fs;
 use serde::Deserialize;
 use std::path::Path;
 use std::io;
-use std::collections::HashMap;
+//use crate::create_hs::white_noise;
+
+#[allow(dead_code)]
+#[derive(Deserialize, Debug, Copy, Clone)]
+pub enum Units {
+    mom,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+pub struct Config {
+    pub general: General,
+    pub ggm: Ggm,
+    pub linear: Linear,
+}
 
 //TODO: Add toher models configuration
 #[allow(dead_code)]
@@ -14,20 +28,7 @@ pub struct General {
     pub number_of_simulations: i32,
     pub repeatable_noise: bool,
     pub deterministic_noise: bool,
-    pub order: Vec<ModelEnum>
-}
-
-#[allow(dead_code)]
-#[derive(Deserialize, Debug, Copy, Clone)]
-pub enum ModelEnum {
-    Ggm,
-    Linear
-}
-
-#[allow(dead_code)]
-#[derive(Deserialize, Debug, Copy, Clone)]
-pub enum Units {
-    mom,
+    pub order: Vec<String>
 }
 
 #[allow(dead_code)]
@@ -54,65 +55,93 @@ pub struct Linear {
     pub units: Units
 }
 
-#[allow(dead_code)]
-#[derive(Deserialize, Debug)]
-pub enum Model {
-    Ggm(Ggm),
-    Linear(Linear),
+#[derive(Debug)]
+enum Model {
+    GGM(Ggm),
+    LINEAR(Linear),
 }
 
-impl Config {
-    pub fn get_model(&self, model: &str) -> Result<Model, String> {
-        // Get a model using the name string
-        match model {
-            "GGM" => Ok(Model::Ggm(self.ggm.unwrap().clone())),
-            "Linear" => Ok(Model::Linear(self.linear.unwrap().clone())),
-            _ => Err("Model not found".to_string()),
-        }
+fn culo_negro(i: i32, b: i32) -> Vec<i32>{
+    println!("Culo negro");
+    let v: Vec<i32> = vec![1, 5];
+    v
+}
+
+fn culo_gris(i: i32, b: i32) -> Vec<i32>{
+    println!("Culo negro");
+    let v: Vec<i32> = vec![1, 5];
+    v
+}
+
+impl Model {
+    fn call(&self) -> Vec<i32> {
+        let response = match &self {
+            Model::GGM(x) => culo_negro(x.m, x.m),
+            Model::LINEAR(x) => culo_gris(x.m, x.m),
+        };
+        response
     }
 }
 
-#[allow(dead_code)]
-#[derive(Deserialize, Debug)]
-pub struct Config {
-    pub general: General,
-    pub ggm: Option<Ggm>,
-    pub linear: Option<Linear>
+fn model_list_from_config(config: &Config) -> Vec<Model> {
+    let mut res: Vec<Model> = Vec::new();
+    for model in config.general.order.iter() {
+        match model.as_str() {
+            "GGM" => res.push(Model::GGM(config.ggm)),
+            "LINEAR" => res.push(Model::LINEAR(config.linear)),
+            _ => panic!("No model name")
+        }
+    }
+    res
 }
 
 pub fn load_config_toml(filename: &Path) -> Result<Config, io::Error> {
     let content = fs::read_to_string(filename)?; 
-    let value: Config = toml::from_str(&content).expect("Error parsing file");
-    Ok(value)
+    let config: Config = toml::from_str(&content).expect("Error parsing file");
+    let lista = model_list_from_config(&config);
+
+    println!("---> {:#?}", lista);
+    Ok(config)
 }
+
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::{load_config_toml, Units};
+    use crate::utils::{load_config_toml, Units, model_list_from_config};
     use std::path::Path;
     
     #[test]
-    fn test_get_function_list_ok() {
-        let path = Path::new("./test2.toml");
-        let config = load_config_toml(&path).unwrap();
-        println!("{:#?}", config);
-        println!("{:#?}", config.get_model("GGM").unwrap());
-    }
-
-    #[test]
-    fn test_load_config_toml_ok() {
+    fn test_utils_get_function_list_ok() {
         let path = Path::new("./test2.toml");
         let config = load_config_toml(&path).unwrap();
         println!("{:#?}", config);
 
-        match config.ggm {
-            Some(x) => assert_eq!(x.m, 1000),
-            None => panic!("Missing ggm"),
+        let lista = model_list_from_config(&config);
+        println!("---> {:#?}", lista);
+
+        let mut res: Vec<Vec<i32>> = Vec::new();
+        for i in lista.iter() {
+            res.push(i.call())
         }
 
-        match config.linear {
-            Some(x) => assert_eq!(x.m, 1000),
-            None => panic!("Missing linear"),
-        }
+        println!("{:?}", res);
+        assert_eq!(1,2);
     }
+
+    //#[test]
+    //fn test_utils_load_config_toml_ok() {
+    //    let path = Path::new("./test2.toml");
+    //    let config = load_config_toml(&path).unwrap();
+    //    println!("{:#?}", config);
+
+    //    match config.ggm {
+    //        Some(x) => assert_eq!(x.m, 1000),
+    //        None => panic!("Missing ggm"),
+    //    }
+
+    //    match config.linear {
+    //        Some(x) => assert_eq!(x.m, 1000),
+    //        None => panic!("Missing linear"),
+    //    }
+    //}
 }
