@@ -1,8 +1,7 @@
 mod utils;
 //mod simulatenoise;
-//mod create_hs;
+mod create_hs;
 use clap::Parser;
-//use crate::create_hs::{SigmaH, white_noise};
 use std::error::Error;
 
 #[derive(Parser)]
@@ -19,8 +18,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args = Cli::parse();
     println!("{:?}", args.control_file);
     
-    let config = utils::load_config_toml(args.control_file.as_path())?;
-    println!("{:#?}", config);
+ //   let config = utils::load_config_toml(args.control_file.as_path())?;
+ //   println!("{:#?}", config);
     
  //   //let noise = simulatenoise::simulate_noise(&config);
  //   let wnoise: SigmaH = white_noise(10, 0.5).unwrap();

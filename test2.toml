@@ -5,7 +5,7 @@ time_noise_start=0
 number_of_simulations=10
 repeatable_noise=true
 deterministic_noise=true
-order=["GGM","LINEAR"]
+order=["GGM", "WHITENOISE"]
 
 [ggm]
 time_noise_start=0
@@ -16,11 +16,6 @@ one_minus_phi=0.01 # GGN_1mphi
 dt=1 # Sampling period
 units="mom" # TS-format
 
-[linear]
-time_noise_start=0
+[white_noise]
 m=1000
 sigma=0.2
-kappa=0.1
-one_minus_phi=0.01 # GGN_1mphi
-dt=1 # Sampling period
-units="mom" # TS-formatp

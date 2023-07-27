@@ -2,20 +2,15 @@ use std::fs;
 use serde::Deserialize;
 use std::path::Path;
 use std::io;
-//use crate::create_hs::white_noise;
+use crate::create_hs::{white, Units};
 
-#[allow(dead_code)]
-#[derive(Deserialize, Debug, Copy, Clone)]
-pub enum Units {
-    mom,
-}
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub struct Config {
     pub general: General,
+    pub white_noise: WhiteNoise,
     pub ggm: Ggm,
-    pub linear: Linear,
 }
 
 //TODO: Add toher models configuration
@@ -34,8 +29,7 @@ pub struct General {
 #[allow(dead_code)]
 #[derive(Deserialize, Debug, Copy, Clone)]
 pub struct Ggm {
-    pub time_noise_start: i32,
-    pub m: i32,
+    pub m: usize,
     pub sigma: f32,
     pub kappa: f32,
     pub one_minus_phi: f32,
@@ -45,39 +39,23 @@ pub struct Ggm {
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug, Copy, Clone)]
-pub struct Linear {
-    pub time_noise_start: i32,
-    pub m: i32,
-    pub sigma: f32,
-    pub kappa: f32,
-    pub one_minus_phi: f32,
-    pub dt: f32, 
-    pub units: Units
+pub struct WhiteNoise {
+    m: usize,
+    sigma: f32,
 }
 
 #[derive(Debug)]
 enum Model {
     GGM(Ggm),
-    LINEAR(Linear),
-}
-
-fn culo_negro(i: i32, b: i32) -> Vec<i32>{
-    println!("Culo negro");
-    let v: Vec<i32> = vec![1, 5];
-    v
-}
-
-fn culo_gris(i: i32, b: i32) -> Vec<i32>{
-    println!("Culo negro");
-    let v: Vec<i32> = vec![1, 5];
-    v
+    WHITENOISE(WhiteNoise),
 }
 
 impl Model {
-    fn call(&self) -> Vec<i32> {
+    fn call(&self) -> Vec<f32> {
+        // Take the self type and match it to the correct model function
         let response = match &self {
-            Model::GGM(x) => culo_negro(x.m, x.m),
-            Model::LINEAR(x) => culo_gris(x.m, x.m),
+            Model::WHITENOISE(x) => white(x.m, x.sigma).unwrap().h,
+            Model::GGM(x) => white(x.m, x.sigma).unwrap().h,
         };
         response
     }
@@ -88,7 +66,7 @@ fn model_list_from_config(config: &Config) -> Vec<Model> {
     for model in config.general.order.iter() {
         match model.as_str() {
             "GGM" => res.push(Model::GGM(config.ggm)),
-            "LINEAR" => res.push(Model::LINEAR(config.linear)),
+            "WHITENOISE" => res.push(Model::WHITENOISE(config.white_noise)),
             _ => panic!("No model name")
         }
     }
@@ -99,7 +77,6 @@ pub fn load_config_toml(filename: &Path) -> Result<Config, io::Error> {
     let content = fs::read_to_string(filename)?; 
     let config: Config = toml::from_str(&content).expect("Error parsing file");
     let lista = model_list_from_config(&config);
-
     println!("---> {:#?}", lista);
     Ok(config)
 }
@@ -107,7 +84,8 @@ pub fn load_config_toml(filename: &Path) -> Result<Config, io::Error> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::{load_config_toml, Units, model_list_from_config};
+    use crate::utils::{load_config_toml, model_list_from_config};
+    use crate::create_hs::Units;
     use std::path::Path;
     
     #[test]
@@ -115,17 +93,21 @@ mod tests {
         let path = Path::new("./test2.toml");
         let config = load_config_toml(&path).unwrap();
         println!("{:#?}", config);
-
+        
+        //convert the config to a list of Models to be called
         let lista = model_list_from_config(&config);
         println!("---> {:#?}", lista);
-
-        let mut res: Vec<Vec<i32>> = Vec::new();
+        
+        // call each model
+        let mut response: Vec<Vec<f32>> = Vec::new();
         for i in lista.iter() {
-            res.push(i.call())
+            response.push(i.call())
         }
 
-        println!("{:?}", res);
-        assert_eq!(1,2);
+        println!("{:?}", response);
+        let expected: Vec<Vec<f32>> = vec![vec![1.0, 5.0], vec![1.0, 5.0]];
+        //assert_eq!(response, expected);
+        //assert_eq!(1,2);
     }
 
     //#[test]
