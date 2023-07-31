@@ -3,18 +3,18 @@ use crate::utils::Config;
 use std::time::Instant;
 use rand::Rng;
 //use rand::rngs::ThreadRng;
-use rand_distr::Normal;
+use rand_distr::{Normal,Distribution};
 use crate::fftconvolve::fftconvolve_vec;
-use crate::create_hs::powerlaw;
+use crate::create_hs::{SigmaH,powerlaw};
 
-fn create_noise(impulso: SigmaH, rng: Rng) -> Vec<f32> {
+fn create_noise<R: Rng>(impulso: SigmaH, mut rng: R) -> Vec<f32> {
     let SigmaH { sigma, h } = impulso;
-    let normal = Normal<f32>;
-    let m = h.len()
+    let normal = Normal::new(0.0,1.0).unwrap();
+    let m = h.len();
 
     let vals: Vec<f32> = (0..m).map(|_| rng.sample(&normal)).collect();
 
-    fftconvolve(h,vals)[0..m].to_vec()
+    fftconvolve_vec(h,vals)[0..m].to_vec()
 }
 
 
@@ -73,12 +73,14 @@ fn create_noise(impulso: SigmaH, rng: Rng) -> Vec<f32> {
 #[cfg(test)]
 mod tests {
     use rand_chacha::ChaCha8Rng;
+    use rand::{Rng,SeedableRng};
+    use rand_distr::{Normal,Distribution};
 
     #[test]
     fn test_random_numbers(){
-        let mut rng = ChaCha8Rng::fromSeed(42)
+        let mut rng = ChaCha8Rng::seed_from_u64(42);
 
-        let normal = Normal<f32>;
+        let normal = Normal::new(0.0,1.0).unwrap();
         let vals: Vec<f32> = (0..1000).map(|_| rng.sample(&normal)).collect();
 
         println!("{:?}",vals) 

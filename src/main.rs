@@ -1,6 +1,8 @@
 mod utils;
 //mod simulatenoise;
 mod create_hs;
+mod onenoise;
+mod fftconvolve;
 use clap::Parser;
 use std::error::Error;
 
